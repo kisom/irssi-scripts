@@ -1,0 +1,8 @@
+collection of irssi scripts i wrote because i wanted to
+
+if you are reading this and dumb^H^H^H^Hbrave enough to play with them, they are dual
+licensed under the public domain / isc licenses. use whatever is less restrictive in your
+region, or whichever you wish.
+
+* geojoin: geoip lookups on users joining a channel
+
