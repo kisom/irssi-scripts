@@ -3,6 +3,7 @@ author: kyle isom <coder@kyleisom.net>
 license: isc / public domain - select whichever is less restrictive in your locale
 
 
-
+dependencies:
+    * Geo::IP
 
 
