@@ -24,21 +24,31 @@ $VERSION    = '0.1-alpha';
     url                 => 'http://www.brokenlcd.net',
 );
 
-
-if ( $use_city_records && ( ! -s $city_recfile ) ) { 
-    &warn("want to use city records but $city_recfile not found!");
-    return;
-}
-
-else {
-    $enabled = 1;
-}
-
 # set up script variables
 Irssi::settings_add_str('geojoin', 'use_city_records', $use_city_records);
 Irssi::settings_add_str('geojoin', 'city_record_file', $city_recfile);
 my @watchlist   = ( );
 
+#### START #####
+&init();
+
+##### INIT SUBS #####
+sub init {
+    &info("version $VERSION");
+    &check_db();
+}
+
+sub check_db {
+    if ( $use_city_records && ( ! -s $city_recfile ) ) { 
+        &warn("want to use city records but $city_recfile not found!");
+        $enabled = 0;
+        return;
+    }
+
+    else {
+        $enabled = 1;
+    }
+}
 
 ##### SETTING SUBS #####
 
@@ -64,7 +74,7 @@ sub del_channel {
     my $pre_chan = @watchlist;
 
     my $chanlist = join(' ', @watchlist);
-    $chanlist ~= s/$rm_channel//g ;
+    $chanlist =~ s/ $rm_chan //g ;
     my @watchlist = split(' ', $chanlist);
 
     my $post_chan = @watchlist;
@@ -91,3 +101,9 @@ sub warn {
     Irssi::print("[!] geojoin: warning - $message");
 }
 
+
+##### GeoIP functions #####
+sub channel_join {
+    
+
+}
