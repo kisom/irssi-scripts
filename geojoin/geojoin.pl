@@ -58,6 +58,27 @@ sub add_channel {
     }
 }
 
+sub del_channel {
+    my ($rm_chan) = @_;
+
+    my $pre_chan = @watchlist;
+
+    my $chanlist = join(' ', @watchlist);
+    $chanlist ~= s/$rm_channel//g ;
+    my @watchlist = split(' ', $chanlist);
+
+    my $post_chan = @watchlist;
+
+    if ($pre_chan > $post_chan) {
+        my $deleted = $pre_chan - $post_chan;
+        &info("removed $deleted channel(s)");
+    }
+
+    else {
+        &info("$rm_chan was not being watched!");
+    }
+}
+
 
 ##### UTILITY SUBS #####
 sub info {
