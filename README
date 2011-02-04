@@ -4,5 +4,6 @@ if you are reading this and dumb^H^H^H^Hbrave enough to play with them, they are
 licensed under the public domain / isc licenses. use whatever is less restrictive in your
 region, or whichever you wish.
 
+* test.pl: ensure the Irssi module is installed
 * geojoin: geoip lookups on users joining a channel
 
