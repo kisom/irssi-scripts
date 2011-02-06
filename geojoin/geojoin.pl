@@ -7,10 +7,11 @@ use Irssi;
 use vars qw($VERSION %IRSSI);
 
 use Geo::IP;
+use Geo::IP::Record;
 
 # set up geoip city records file and irssi vars
 my $city_recfile        = '/usr/local/share/GeoIP/GeoLiteCity.dat';
-my $use_city_records    = 'false';
+my $use_city_records    = 'true';
 my $enabled             = 0;
 $VERSION    = '0.1-alpha';
 %IRSSI      = (
@@ -103,6 +104,11 @@ sub info {
     Irssi::print("[+] geojoin: $message", Irssi::MSGLEVEL_CLIENTNOTICE);
 }
 
+sub chan_info {
+    my ($msg, $srv, $chan) = @_;
+    $srv->print($chan, "[+] geojoin: $msg", Irssi::MSGLEVEL_CLIENTNOTICE);
+}
+
 sub warn {
     my ($message) = @_;
     Irssi::print("[!] geojoin: warning - $message", Irssi::MSGLEVEL_CLIENTNOTICE);
@@ -111,8 +117,9 @@ sub warn {
 
 ##### GeoIP functions #####
 sub channel_join {
-    my ($server, $data, $nick, $address) = @_;
-    if (&watching($data)) {
+    my ($server, $chan, $nick, $address) = @_;
+
+    if (&watching($chan)) {
         my $host = $address;
         $host =~ s/.+@(.+)/$1/ ;
 
@@ -121,17 +128,18 @@ sub channel_join {
         }
         else {
             if ("$use_city_records" eq "true") {
-                &city_lookup($host);
+                my $record = &city_lookup($host);
+                &chan_info("$host via { city: " . $record->city . ", "  .
+                           "region: " . $record->region . ", country; " .
+                           $record->country_code . ", timezone: " .
+                           $record->time_zone . " }", $server, $chan);
             }
             else {
-                &country_lookup($host);
+                my $country = &country_lookup($host, $server, $chan);
+                &chan_info("$host via $country", $server, $chan);
             }
         }
     }
-    else {
-        &info("$data not being watched: @watchlist");
-    }
-
 }
 
 sub country_lookup {
@@ -147,5 +155,22 @@ sub country_lookup {
         $country = $gi->country_code_by_name($target_addr);
     }
     
-    &info("$target_addr: $country");
+    return $country;
+}
+
+sub city_lookup {
+    my ($target_addr) = @_;
+    my $gi = Geo::IP->open($city_recfile, GEOIP_STANDARD);
+    my $record = "";
+
+    if ($target_addr =~ /(\d{1,3}\.){3}\d{1,3}/) {
+        $record = $gi->record_by_addr($target_addr);
+    }
+    else {
+        $record = $gi->record_by_name($target_addr);
+    }
+    
+    return $record;
+
+       
 }
