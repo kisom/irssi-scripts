@@ -73,20 +73,12 @@ sub del_channel {
 
     my $pre_chan = @watchlist;
 
-    my $chanlist = join(' ', @watchlist);
-    $chanlist =~ s/ $rm_chan //g ;
-    my @watchlist = split(' ', $chanlist);
-
-    my $post_chan = @watchlist;
-
-    if ($pre_chan > $post_chan) {
-        my $deleted = $pre_chan - $post_chan;
-        &info("removed $deleted channel(s)");
+    for (my $idx = 0; $idx < $#watchlist; $idx++) {
+        if $watchlist[$idx] =~ /$rm_chan/ {
+            splice(@watchlist, $idx, 1);
+            &info("removed $rm_chan from list of monitored channels");
     }
 
-    else {
-        &info("$rm_chan was not being watched!");
-    }
 }
 
 
