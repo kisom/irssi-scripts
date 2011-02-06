@@ -37,9 +37,8 @@ my @watchlist   = ( '#geoip_test' );
 sub init {
     &info("version $VERSION");
     &check_db();
-    if ($enabled == 1) {
-        Irssi::signal_add('message join', 'channel_join');
-    }
+    Irssi::signal_add('message join', 'channel_join');
+    Irssi::command_bind geojoin => \&geojoin_command ;
 }
 
 sub check_db {
@@ -59,17 +58,22 @@ sub check_db {
 # add a channel to the watch list
 sub add_channel {
     my ($new_channel) = @_;
-    
-    if (grep($new_channel, @watchlist)) {
-        &info("$new_channel already being monitored!");
-        return;
-    } 
 
-    else {
+    if (! @watchlist) {
+        push(@watchlist, $new_channel);
+        &info("$new_channel added to watchlist");
+        return;
+    }
+    
+    foreach (@watchlist) {
+        last if /^$new_channel$/ ;
         push(@watchlist, $new_channel);
         &info("$new_channel added to watchlist");
         return; 
-    }
+    } 
+
+    &info("$new_channel already being monitored!");
+    return;
 }
 
 sub del_channel {
@@ -77,7 +81,7 @@ sub del_channel {
 
     my $pre_chan = @watchlist;
 
-    for (my $idx = 0; $idx < $#watchlist; $idx++) {
+    for (my $idx = 0; $idx < @watchlist; $idx++) {
         if ($watchlist[$idx] =~ /$rm_chan/) {
             splice(@watchlist, $idx, 1);
             &info("removed $rm_chan from list of monitored channels");
@@ -90,10 +94,7 @@ sub del_channel {
 sub watching {
     my ($channel) = @_;
 
-    for (@watchlist) {
-        &info("checking $_ against $channel");
-        return 1 if /$channel/ ;
-    }
+    for (@watchlist) { return 1 if /^$channel$/ ; }
     return 0;
 }
 
@@ -117,6 +118,7 @@ sub warn {
 
 ##### GeoIP functions #####
 sub channel_join {
+    return if !$enabled ;
     my ($server, $chan, $nick, $address) = @_;
 
     if (&watching($chan)) {
@@ -129,16 +131,21 @@ sub channel_join {
         else {
             if ("$use_city_records" eq "true") {
                 my $record = &city_lookup($host);
-                &chan_info("$host via { city: " . $record->city . ", "  .
+                &chan_info("$nick joining from $host via { city: " . 
+                           $record->city . ", "  .
                            "region: " . $record->region . ", country; " .
                            $record->country_code . ", timezone: " .
                            $record->time_zone . " }", $server, $chan);
             }
             else {
                 my $country = &country_lookup($host, $server, $chan);
-                &chan_info("$host via $country", $server, $chan);
+                &chan_info("$nick joining from $host via $country", $server, 
+                           $chan);
             }
         }
+    }
+    else {
+        &chan_info("$nick joining with hostmask, skipping geoip lookup...");
     }
 }
 
@@ -173,4 +180,64 @@ sub city_lookup {
     return $record;
 
        
+}
+
+sub geojoin_command {
+    my ($argline, $server) = @_ ;
+    my ($command, @args)   = split(/ /, $argline);
+    
+    if ("$command" eq "add" ) {
+        foreach (@args) {
+            &add_channel($_);
+        }
+    } 
+    elsif ("$command" eq "del") {
+        foreach (@args) {
+            &del_channel($_);
+        }
+    }
+    elsif ("$command" eq "status") {
+        &info("geojoin v$VERSION status:");
+
+        if ($enabled == 1) { &info("GeoIP lookups enabled"); }
+        else { &info("GeoIP lookups disabled"); }
+
+        if ("$use_city_records" eq 'true') {
+            &info("using city records");
+        }
+        else {
+            &info("using country records");
+        }
+
+        &info("channel list:");
+        foreach (@watchlist) {
+            &info("    $_", Irssi::MSGLEVEL_CLIENTNOTICE);
+        }
+    }
+    elsif ("$command" eq "disable") { $enabled = 0; }
+    elsif ("$command" eq "enable")  { $enabled = 1; }
+    elsif ("$command" eq "use_country") { $use_city_records = 'false'; }
+    elsif ("$command" eq "use_city") { 
+        $use_city_records = 'true'; 
+        &check_db(); 
+    }
+    elsif ("$command" eq "set_citydb") { 
+        $city_recfile = $args[0];
+        &check_db();
+    }
+    elsif ("$command" eq "help") { 
+        &info("help and usage:");
+        my $help_msg = <<END_HELP;
+geojoin checks specified channels for joins and performs GeoIP lookups on connecting hosts. by default it uses country lookups.
+command list:
+    add <channel list>      add channels to watchlist
+    del <channel list>      remove channel from watchlist
+    disable                 disable geojoin
+    enable                  enable geojoin
+    use_country             use country lookups (default)
+    use_city                use city lookups 
+    status                  view current status
+END_HELP
+        &info($help_msg); 
+   } 
 }
