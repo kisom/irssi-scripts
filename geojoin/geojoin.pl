@@ -11,7 +11,7 @@ use Geo::IP::Record;
 
 # set up geoip city records file and irssi vars
 my $city_recfile        = '/usr/local/share/GeoIP/GeoLiteCity.dat';
-my $use_city_records    = 'true';
+my $use_city_records    = 'false';
 my $enabled             = 0;
 $VERSION    = '0.1-alpha';
 %IRSSI      = (
@@ -36,7 +36,9 @@ my @watchlist   = ( '#geoip_test' );
 ##### INIT SUBS #####
 sub init {
     &info("version $VERSION");
-    &check_db();
+    if ("$use_city_records" eq "true") {
+        &check_db();
+    }
     Irssi::signal_add('message join', 'channel_join');
     Irssi::command_bind geojoin => \&geojoin_command ;
 }
@@ -44,7 +46,7 @@ sub init {
 sub check_db {
     if ( $use_city_records && ( ! -s $city_recfile ) ) { 
         &warn("want to use city records but $city_recfile not found!");
-        $enabled = 1;
+        $enabled = 0;
         return;
     }
 
