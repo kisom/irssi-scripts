@@ -1,7 +1,10 @@
 geojoin: irssi script to get GeoIP data on users joining a channel.
 author: kyle isom <coder@kyleisom.net> 
 license: isc / public domain - select whichever is less restrictive in your locale
-
+latest version can be pulled from 
+[github](https://github.com/kisom/irssi-scripts/tree/master/geojoin)
+or you can clone the entire collection of scripts using:    
+`git clone git://github.com/kisom/irssi-scripts.git`
 
 dependencies:
 * Geo::IP
