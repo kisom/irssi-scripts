@@ -1,6 +1,7 @@
 geojoin: irssi script to get GeoIP data on users joining a channel.
 author: kyle isom <coder@kyleisom.net> 
-license: isc / public domain - select whichever is less restrictive in your locale
+license: isc / public domain - select whichever is less restrictive in your 
+    locale
 
 
 dependencies:

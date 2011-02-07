@@ -1,0 +1,12 @@
+xosd-notify: irssi script to display hilights and PMs via xosd
+author: kyle isom <coder@kyleisom.net>
+license: isc / public domain - select whichever is less restrictive in your
+    locale
+
+dependencies:
+    * libxosd2
+    * libxosd-dev
+    * X::Osd
+
+
+

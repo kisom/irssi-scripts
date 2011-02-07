@@ -28,7 +28,7 @@ $VERSION    = '0.1-beta';
     description         => 'perform geoip city record lookups on joins ' .
                            'in specified channels',
     license             => 'dual-licensed public domain / ISC',
-    url                 => 'http://www.brokenlcd.net',
+    url                 => 'http://www.brokenlcd.net/code/irssi/index.html',
 );
 
 my @watchlist   = ( '#geoip_test' );

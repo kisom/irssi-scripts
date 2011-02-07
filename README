@@ -6,4 +6,6 @@ region, or whichever you wish.
 
 * test.pl: ensure the Irssi module is installed
 * geojoin: geoip lookups on users joining a channel
+* xosd-notify: sends hilights and PMs to xosd
+
 
