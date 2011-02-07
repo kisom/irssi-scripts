@@ -39,6 +39,7 @@ sub init {
     if ("$use_city_records" eq "true") {
         &check_db();
     }
+    else { $enabled = 1; }
     Irssi::signal_add('message join', 'channel_join');
     Irssi::command_bind geojoin => \&geojoin_command ;
 }
