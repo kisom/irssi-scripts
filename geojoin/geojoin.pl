@@ -220,13 +220,31 @@ sub geojoin_command {
     elsif ("$command" eq "clear") {
         @watchlist = ( );
         $enabled = 0;
+        &info("cleared watchlist and disabled script");
     }
-    elsif ("$command" eq "disable") { $enabled = 0; }
-    elsif ("$command" eq "enable")  { $enabled = 1; }
-    elsif ("$command" eq "use_country") { $use_city_records = 'false'; }
+    elsif ("$command" eq "disable") { 
+        $enabled = 0; 
+        &info("disabled");
+    }
+    elsif ("$command" eq "enable")  { 
+        $enabled = 1; 
+        &info("enabled");
+    }
+    elsif ("$command" eq "use_country") { 
+        $use_city_records = 'false'; 
+        &info("using country record lookups");
+    }
     elsif ("$command" eq "use_city") { 
         $use_city_records = 'true'; 
         &check_db(); 
+        if ($enabled == 0) {
+            &warn("error loading city record $city_recfile");
+            &warn("geojoin disabled!");
+        }
+        else {
+            &info("using city record lookups");
+            &info("city record database: $city_recfile");
+        }
     }
     elsif ("$command" eq "set_citydb") { 
         $city_recfile = $args[0];
