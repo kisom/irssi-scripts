@@ -135,7 +135,7 @@ sub channel_join {
                 my $record = &city_lookup($host);
                 &chan_info("$nick joining from $host via { city: " . 
                            $record->city . ", "  .
-                           "region: " . $record->region . ", country; " .
+                           "region: " . $record->region . ", country: " .
                            $record->country_code . ", timezone: " .
                            $record->time_zone . " }", $server, $chan);
             }

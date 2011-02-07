@@ -25,7 +25,6 @@ command list:
     enable                  enable lookups
     clear                   clear watchlist and disables geojoin
 
-
 caveats:
     * if you want to use city records you need the GeoLiteCity database at
     http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
