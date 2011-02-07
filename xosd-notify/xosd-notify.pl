@@ -27,6 +27,10 @@ $VERSION = '0.1-prealpha';
 my $num_lines       = 1;        # number of lines to use for the display
 my $osd             = "";
 
+
+##### kick these shenanigans off #####
+&init();
+
 sub init {
     # set up Irssi settings
     Irssi::settings_add_str('xosd-notify', 'xosd_font', 'fixed');
@@ -38,8 +42,8 @@ sub init {
     Irssi::settings_add_int('xosd-notify', 'xosd_border', 10); 
 
     # set up Irssi signal handlers
-    Irssi::signal_add_last('event privmsg', 'event_privmsg');
-    Irssi::signal_add_last('window hilight', 'win_hl');
+    Irssi::signal_add_last('message private', 'event_privmsg');
+    Irssi::signal_add_last('window item hilight', 'win_hl');
 
     $osd = X::Osd->new($num_lines); 
     &osd_setup();
@@ -52,7 +56,7 @@ sub osd_setup {
 
     $osd->set_font(Irssi::settings_get_str('xosd_font'));
     $osd->set_colour(Irssi::settings_get_str('xosd_foreground'));
-    $osd->set_outline_color(Irssi::settings_get_str('xosd_background'));
+    $osd->set_outline_colour(Irssi::settings_get_str('xosd_background'));
     $osd->set_outline_offset(Irssi::settings_get_int('xosd_border'));
     $osd->set_pos($vert);
     $osd->set_align($horiz);
@@ -66,6 +70,7 @@ sub osd_setup {
 
     # osd should be done
     $osd->string(0, "xosd-notify $VERSION loaded!");
+    Irssi::print("xosd-notify $VERSION loaded!");
 
 }
 
@@ -95,12 +100,12 @@ sub translate_position {
 
 sub event_privmsg {
     my ($server, $data, $nick, $address) = @_ ;
-    $osd->string("data: $data");
-    sleep 2;
-    Irssi::print("data: $data");
+    $osd->string(0, "$nick: $data");
 }
 
 sub win_hl {
-    Irssi::print("window hilight triggered", Irssi::MSGLEVEL_CLIENTNOTICE);
-
+    my ($witem) = @_;
+    $osd->string(0, "highlight in " . $witem->{ name } );
 }
+
+
