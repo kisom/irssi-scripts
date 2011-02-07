@@ -148,19 +148,19 @@ sub channel_join {
                 # nasty blob that prints useful city record information
                 my $city_info = "$nick join from $host via { ";
 
-                if (defined $record->city) { 
+                if ($record->city ) { 
                     $city_info .= "city: " . $record->city . "; ";
                 }
             
-                if (defined $record->region) {
+                if ($record->region) {
                     $city_info .= "region: ". $record->region . "; ";
                 }
 
-                if (defined $record->country_code) {
+                if ($record->country_code) {
                     $city_info .= "country: " . $record->country_code . "; ";
                 }
 
-                if (defined $record->time_zone) {
+                if ($record->time_zone) {
                     $city_info .= "timezone: " . $record->time_zone . "; ";
                 }
 
