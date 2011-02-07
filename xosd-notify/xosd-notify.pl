@@ -12,7 +12,7 @@ use vars qw($VERSION %IRSSI);
 use X::Osd;
 
 # set up Irssi vars
-$VERSION = '0.1-prealpha'
+$VERSION = '0.1-prealpha';
 
 %IRSSI   = (
     authors         => 'kyle isom',
@@ -24,33 +24,48 @@ $VERSION = '0.1-prealpha'
     url             => 'http://www.brokenlcd.net/code/irssi/index.html',
 );
 
+my $num_lines       = 1;        # number of lines to use for the display
+my $osd             = "";
+
 sub init {
     # set up Irssi settings
-    Irssi::settings_add_str('xosd-notify', 'font', 'fixed');
-    Irssi::settings_add_str('xosd-notify', 'foreground', '#00FF00');
-    Irssi::settings_add_str('xosd-notify', 'background', '#000000');
-    Irssi::settings_add_str('xosd-notify', 'shadow-colour', '#111');
-    Irssi::settings_add_int('xosd-notify', 'timeout', 5);
-    Irssi::settings_add_int('xosd-notify', 'border', 10); 
+    Irssi::settings_add_str('xosd-notify', 'xosd_font', 'fixed');
+    Irssi::settings_add_str('xosd-notify', 'xosd_foreground', '#00FF00');
+    Irssi::settings_add_str('xosd-notify', 'xosd_background', '#000000');
+    Irssi::settings_add_str('xosd-notify', 'xosd_shadow-colour', '#111');
+    Irssi::settings_add_str('xosd-notify', 'xosd_position', 'top-left');
+    Irssi::settings_add_int('xosd-notify', 'xosd_timeout', 5);
+    Irssi::settings_add_int('xosd-notify', 'xosd_border', 10); 
 
     # set up Irssi signal handlers
     Irssi::signal_add_last('event privmsg', 'event_privmsg');
     Irssi::signal_add_last('window hilight', 'win_hl');
 
-    my $osd = X::Osd->new($num_lines); 
+    $osd = X::Osd->new($num_lines); 
+    &osd_setup();
 
 }
 
 sub osd_setup {
     my ($vert, $horiz) = &translate_position(Irssi::settings_get_str(
-        'xosd-notify', 'position'));
+        'xosd_position'));
 
-    $osd->set_font(Irssi::settings_get_str('xosd-notify', 'font'));
-    $osd->set_colour(Irssi::settings_get_str('xosd-notify', 'foreground'));
-    $osd->set_outline_color(Irssi::settings_get_str('xosd-notify', 
-        'background'));
-    $osd->set_outline_offset(Irssi::settings_get_int('xosd-notify',
-        'border'));
+    $osd->set_font(Irssi::settings_get_str('xosd_font'));
+    $osd->set_colour(Irssi::settings_get_str('xosd_foreground'));
+    $osd->set_outline_color(Irssi::settings_get_str('xosd_background'));
+    $osd->set_outline_offset(Irssi::settings_get_int('xosd_border'));
+    $osd->set_pos($vert);
+    $osd->set_align($horiz);
+    $osd->set_timeout(Irssi::settings_get_int('xosd_timeout'));
+
+    # should add option to use shadow and offset sizes
+    # $osd->set_horizontal_offset()
+    # $osd->set_vertical_offset();
+    # $osd->set_shadow_offset();
+    # $osd->set_shadow_colour();
+
+    # osd should be done
+    $osd->string(0, "xosd-notify $VERSION loaded!");
 
 }
 
@@ -81,10 +96,11 @@ sub translate_position {
 sub event_privmsg {
     my ($server, $data, $nick, $address) = @_ ;
     $osd->string("data: $data");
+    sleep 2;
     Irssi::print("data: $data");
 }
 
 sub win_hl {
-    Irssi::print("window hilight triggered", Irssi::MSGLEVEL_CLIENTINFO);
+    Irssi::print("window hilight triggered", Irssi::MSGLEVEL_CLIENTNOTICE);
 
 }
