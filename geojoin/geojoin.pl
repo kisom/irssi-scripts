@@ -138,6 +138,10 @@ sub channel_join {
             &info("can't do lookup on hostmask $host for user $nick ".
                   "on $chan, skipping");
         }
+        elsif ($host =~ /:/) {
+            &info("detected ipv6 host for $nick on $chan ($host)");
+            &info("ipv6 lookups not supported yet!");
+        }
         else {
             &chan_info('*** geoip lookup ***', $server, $chan);
             if ("$use_city_records" eq "true") {
@@ -307,7 +311,10 @@ command list:
     status                  view current status
 END_HELP
         &info($help_msg); 
-   } 
+    } 
+    else {
+        &warn("$command is not a valid command!");
+    }
 }
 
 # initialisation sub - print version, check database, register signal handlers
@@ -322,7 +329,7 @@ sub init {
 }
 
 # simple city record database check - just check to see if it has a nonzero
-# size. a bad db will still caused the geoip functions to choke.
+# size. a bad db will still cause the geoip functions to choke.
 sub check_db {
     if ( $use_city_records && ( ! -s $city_recfile ) ) { 
         &warn("want to use city records but $city_recfile not found!");
