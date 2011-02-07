@@ -115,6 +115,12 @@ sub warn {
     Irssi::print("[!] geojoin: warning - $message", Irssi::MSGLEVEL_CLIENTNOTICE);
 }
 
+sub pubmsg {
+    my ($msg, $srv, $chan) = @_ ;
+    $srv->print($chan, $msg, Irssi::MSGLEVEL_PUBLIC);
+    
+}
+
 
 ##### GeoIP functions #####
 # triggered on channel join
@@ -275,6 +281,9 @@ command list:
     enable                  enable geojoin
     use_country             use country lookups (default)
     use_city                use city lookups 
+    set_citydb              set city record database path
+    clear                   clear watchlist and disable geojoin
+    watchlist               show space-delimited list of channels being watched
     status                  view current status
 END_HELP
         &info($help_msg); 
