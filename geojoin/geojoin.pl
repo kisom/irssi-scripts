@@ -135,12 +135,16 @@ sub channel_join {
         $host =~ s/.+@(.+)/$1/ ;        # address in the form user@host
 
         if ($host =~ /\//) {            # a / in the address indicates hostmask
-            &info("can't do lookup on hostmask $host, skipping");
+            &info("can't do lookup on hostmask $host for user $nick ".
+                  "on $chan, skipping");
         }
         else {
             &chan_info('*** geoip lookup ***', $server, $chan);
             if ("$use_city_records" eq "true") {
                 my $record = &city_lookup($host);
+                if (! $record) {
+                    &info("empty record returned for $nick - $address");
+                }
                 # nasty blob that prints useful city record information
                 &chan_info("$nick joining from $host via { city: " . 
                            $record->city . ", "  .
@@ -309,6 +313,9 @@ sub check_db {
         $enabled = 0;       # disable geoip looks on validation failure
     }
 
-    else { $enabled = 1; }  # enable geoip lookups if simple validation passed
+    else {                  # enable geoip lookups if simple validation passed
+        $enabled = 1; 
+        &info("loaded city record database $city_recfile");
+    }  
 }
 
