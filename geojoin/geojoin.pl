@@ -101,7 +101,7 @@ sub info {
 sub chan_info {
     my ($msg, $srv, $chan) = @_;
     return if $msg =~ /^$/ ;            # abort empty message
-    return if (! $srv or ! $chan );
+    return if (! $srv or ! $chan );     # abort on bad server / channel
     $srv->print($chan, "[+] geojoin: $msg", Irssi::MSGLEVEL_CLIENTNOTICE);
 }
 
