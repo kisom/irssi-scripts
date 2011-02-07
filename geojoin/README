@@ -21,6 +21,7 @@ command list:
                             watched
     use_country             use country lookups
     use_city                use city record lookups
+    set_citydb <path>       specify the path to the city record database
     disable                 disable lookups (preserves watchlist)
     enable                  enable lookups
     clear                   clear watchlist and disables geojoin
