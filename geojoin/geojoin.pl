@@ -146,11 +146,27 @@ sub channel_join {
                     &info("empty record returned for $nick - $address");
                 }
                 # nasty blob that prints useful city record information
-                &chan_info("$nick joining from $host via { city: " . 
-                           $record->city . ", "  .
-                           "region: " . $record->region . ", country: " .
-                           $record->country_code . ", timezone: " .
-                           $record->time_zone . " }", $server, $chan);
+                my $city_info = "$nick join from $host via { ";
+
+                if (defined $record->city) { 
+                    $city_info .= "city: " . $record->city . "; ";
+                }
+            
+                if (defined $record->region) {
+                    $city_info .= "region: ". $record->region . "; ";
+                }
+
+                if (defined $record->country_code) {
+                    $city_info .= "country: " . $record->country_code . "; ";
+                }
+
+                if (defined $record->time_zone) {
+                    $city_info .= "timezone: " . $record->time_zone . "; ";
+                }
+
+                $city_info =~ s/; $// ;
+                $city_info .= " }";
+                &chan_info( $city_info, $server, $chan);
             }
             else {
                 my $country = &country_lookup($host, $server, $chan);
