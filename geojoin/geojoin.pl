@@ -88,6 +88,10 @@ sub watching {
     return 0;
 }
 
+sub show_watchlist {
+    &info(join(' ', @watchlist));
+}
+
 
 ##### messaging subs #####
 # print information message with geojoin preface to status window
@@ -256,6 +260,9 @@ sub geojoin_command {
     elsif ("$command" eq "set_citydb") {
         $city_recfile = $args[0];       # set city database
         &check_db();
+    }
+    elsif ("$command" eq "watchlist") {
+        &show_watchlist();
     }
     elsif ("$command" eq "help") {      # get help
         &info("help and usage:");
