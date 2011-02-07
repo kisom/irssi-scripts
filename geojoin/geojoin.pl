@@ -13,7 +13,7 @@ use Geo::IP::Record;
 my $city_recfile        = '/usr/local/share/GeoIP/GeoLiteCity.dat';
 my $use_city_records    = 'false';
 my $enabled             = 0;
-$VERSION    = '0.1-alpha';
+$VERSION    = '0.1-beta';
 %IRSSI      = (
     authors             => 'kyle isom',
     origauthors         => 'kyle isom',
@@ -187,6 +187,7 @@ sub city_lookup {
 sub geojoin_command {
     my ($argline, $server) = @_ ;
     my ($command, @args)   = split(/ /, $argline);
+    $command = lc($command);
     
     if ("$command" eq "add" ) {
         foreach (@args) {
@@ -215,6 +216,10 @@ sub geojoin_command {
         foreach (@watchlist) {
             &info("    $_", Irssi::MSGLEVEL_CLIENTNOTICE);
         }
+    }
+    elsif ("$command" eq "clear") {
+        @watchlist = ( );
+        $enabled = 0;
     }
     elsif ("$command" eq "disable") { $enabled = 0; }
     elsif ("$command" eq "enable")  { $enabled = 1; }
