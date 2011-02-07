@@ -28,7 +28,7 @@ $VERSION    = '0.1-beta';
 # set up script variables
 Irssi::settings_add_str('geojoin', 'use_city_records', $use_city_records);
 Irssi::settings_add_str('geojoin', 'city_record_file', $city_recfile);
-my @watchlist   = ( '#geoip_test' );
+my @watchlist   = ( );
 
 #### START #####
 &init();
