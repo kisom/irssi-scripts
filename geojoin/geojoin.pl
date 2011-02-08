@@ -148,6 +148,7 @@ sub channel_join {
                 my $record = &city_lookup($host);
                 if (! $record) {
                     &info("empty record returned for $nick - $address");
+                    return ;
                 }
                 # nasty blob that prints useful city record information
                 my $city_info = "$nick join from $host via { ";
