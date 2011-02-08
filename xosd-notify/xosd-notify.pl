@@ -24,6 +24,11 @@ $VERSION = '0.1-prealpha';
     url             => 'http://www.brokenlcd.net/code/irssi/index.html',
 );
 
+# global values that might need to be changed
+my $max_len         = 40;
+my $max_words       =  5;
+
+# global values that really don't need to be changed
 my $num_lines       = 1;        # number of lines to use for the display
 my $osd             = "";       # the on-screen display object
 my $enabled         = 1;        # boolean flag
@@ -112,6 +117,8 @@ sub save_settings {
     }
 
     print CONF "# xosd-notify.pl irssi script saved configuration settings\n";
+    print CONF "\nmax_words: $max_words";
+    print CONF "\nmax_len: $max_len";
     print CONF "\nxosd_font: " . Irssi::settings_get_str('xosd_font');
     print CONF "\nxosd_foreground: ";
     print CONF Irssi::settings_get_str('xosd_foreground');
@@ -186,6 +193,12 @@ sub load_settings {
         elsif ($key =~ /^xosd_hoffset$/) {
             Irssi::settings_set_int('xosd_hoffset', $value);
         }
+        elsif ($key =~ /^max_words$/) {
+            $max_words = $value;
+        }
+        elsif ($key =! /^max_len$/) {
+            $max_len = $value;
+        }
     }
 
     # now load the new settings
@@ -245,7 +258,22 @@ sub event_privmsg {
     return if ! $enabled;
     if ($osd->is_onscreen()) { $osd->hide(); }    # clean for new message
     my ($server, $data, $nick, $address) = @_ ;
-    $osd->string(0, "$nick: $data");
+    
+
+    # resize data to first $max_words words if needed
+    my $stub = $data;
+    if ($stub =~ /^((\S+\s){1,$max_words})\S+/) {
+        $stub =~ s/^((\S+\s){1,$max_words}).+$/$1.../ ;
+        $stub =~ s/ [.]{3}$/.../;
+    }
+
+    # if the first $max_words words are really long, truncate the hard way
+    if (length($stub) > $max_len) {
+        $stub = substr($stub, 0, $max_len - 3);
+        $stub = "$stub...";
+    }
+
+    $osd->string(0, "$nick: $stub");
 }
 
 sub win_hl {
