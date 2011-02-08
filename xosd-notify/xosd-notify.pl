@@ -100,7 +100,7 @@ sub osd_config {
 ##### configuration file subs #####
 sub save_settings {
     my ($conf_file) = @_ ;
-    my $exception = undef;
+    my $exception   = undef;
 
     # load a sensible default
     if (! $conf_file) { $conf_file = "$ENV{HOME}/.irssi/.xosd-notifyrc"; }
@@ -135,12 +135,13 @@ sub save_settings {
 
 sub load_settings {
     my ($conf_file) = @_ ;
+    my $exception   = undef;
 
     # load a sensible default
     if (! $conf_file) { $conf_file = "$ENV{HOME}/.irssi/.xosd-notifyrc"; }
 
-    open(CONF, "$conf_file") or $conf_file = "EXCEPTION";
-    if ("$conf_file" eq "EXCEPTION") {
+    open(CONF, "$conf_file") or $exception = 1;
+    if (defined $exception) {
         &warn("error writing to $conf_file - $!");
         return ;
     }
