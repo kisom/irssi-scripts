@@ -241,6 +241,7 @@ sub warn {
 # these were really too easy
 sub event_privmsg {
     return if ! $enabled;
+    if ($osd->is_onscreen()) { $osd->hide(); }    # clean for new message
     my ($server, $data, $nick, $address) = @_ ;
     $osd->string(0, "$nick: $data");
 }
