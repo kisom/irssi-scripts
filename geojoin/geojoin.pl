@@ -175,8 +175,15 @@ sub channel_join {
             }
             else {
                 my $country = &country_lookup($host, $server, $chan);
-                &chan_info("$nick joining from $host via $country", $server, 
-                           $chan);
+
+                if ($country) {
+                    &chan_info("$nick joining from $host via $country", 
+                           $server, $chan);
+                }
+                else {
+                    &chan_info("received empty country record for $nick " .
+                               "($host)");
+                }
             }
         }
     }
