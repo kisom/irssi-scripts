@@ -63,6 +63,10 @@ sub init {
     $osd = X::Osd->new($num_lines); 
     &osd_setup();
 
+    if ( -s "$ENV{HOME}/.irssi/.xosd-notifyrc" ) {
+        &load_settings();
+    }
+
 }
 
 sub osd_setup {
@@ -311,11 +315,11 @@ sub xosd_cmd {
         $osd->string(0, 'xosd-notify: reconfigured');
     }
     elsif ("$command" eq 'save') {          # save configuration to file
-        $args[0] =~ s/^~/$ENV{HOME}/ ;
+        if (defined $args[0]) { $args[0] =~ s/^~/$ENV{HOME}/ ; }
         &save_settings($args[0]);
     }
     elsif ("$command" eq 'load') {          # load configuration to file
-        $args[0] =~ s/^~/$ENV{HOME}/ ;
+        if (defined $args[0]) { $args[0] =~ s/^~/$ENV{HOME}/ ; }
         &load_settings($args[0]);
     }
     elsif ("$command" eq 'clear') {         # remove OSD from screen
