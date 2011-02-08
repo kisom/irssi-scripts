@@ -1,5 +1,7 @@
 # xosd-notify.pl irssi script saved configuration settings
 
+max_words: 5
+max_len: 40
 xosd_font: -*-fixed-medium-*-normal-*-24-230-*-*-*-*-iso8859-1
 xosd_foreground: #0000FF
 xosd_background: #000000
