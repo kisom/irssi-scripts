@@ -44,6 +44,9 @@ sub init {
     Irssi::settings_add_str('xosd-notify', 'xosd_position', 'top-left');
     Irssi::settings_add_int('xosd-notify', 'xosd_timeout', 5);
     Irssi::settings_add_int('xosd-notify', 'xosd_border', 10); 
+    Irssi::settings_add_int('xosd-notify', 'xosd_shadow_offset', 0);
+    Irssi::settings_add_int('xosd-notify', 'xosd_voffset', 5);
+    Irssi::settings_add_int('xosd-notify', 'xosd_hoffset', 5);
 
     # set up Irssi signal handlers
     Irssi::signal_add_last('window item hilight', 'win_hl');
@@ -67,22 +70,31 @@ sub osd_config {
     my ($vert, $horiz) = &translate_position(Irssi::settings_get_str(
         'xosd_position'));
 
+    # setup basic font and colour
     $osd->set_font(Irssi::settings_get_str('xosd_font'));
     $osd->set_colour(Irssi::settings_get_str('xosd_foreground'));
+
+    # setup border
     $osd->set_outline_colour(Irssi::settings_get_str('xosd_background'));
     $osd->set_outline_offset(Irssi::settings_get_int('xosd_border'));
+
+    # setup shadow
+    $osd->set_shadow_offset(Irssi::settings_get_int('xosd_shadow_offset');
+    $osd->set_shadow_colour(Irssi::settings_get_str('xosd_shadow_colour');
+
+    # setup screen position
     $osd->set_pos($vert);
     $osd->set_align($horiz);
+
+    # set the on-screen dwell-time
     $osd->set_timeout(Irssi::settings_get_int('xosd_timeout'));
 
-    # should add option to use shadow and offset sizes
-    # $osd->set_horizontal_offset()
-    # $osd->set_vertical_offset();
-    # $osd->set_shadow_offset();
-    # $osd->set_shadow_colour();
+    # set the horizontal / vertical offsets
+    $osd->set_vertical_offset(Irssi::settings_get_int('xosd_voffset');
+    $osd->set_horizontal_offset(Irssi::settings_get_int('xosd_hoffset');
 
     # osd should be done
-    Irssi::print("xosd-notify $VERSION reconfigured");
+    Irssi::print("xosd-notify $VERSION configured");
 }
 
 
@@ -109,10 +121,6 @@ sub translate_position {
     elsif ( $position =~ /center'$/ )   { $horiz = XOSD_center; }
     elsif ( $position =~ /middle'$/ )   { $horiz = XOSD_center; }
     else                                { $horiz = XOSD_left; }     # default
-
-    &info("vert: $vert");
-    &info(" hor: $horiz");
-    
 
     return ($vert, $horiz);
 }

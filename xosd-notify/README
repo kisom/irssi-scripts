@@ -9,4 +9,17 @@ dependencies:
     * X::Osd
 
 
+commands:
+    * enable
+    * disable
+    * reconfigure
+    * test
+    * load_settings
+    * save_settings
+
+view settings:
+    * /set xosd_
+
+todo:
+    * implement config_files
 
