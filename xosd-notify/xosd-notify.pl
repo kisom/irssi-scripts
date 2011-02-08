@@ -49,8 +49,8 @@ sub init {
     Irssi::settings_add_int('xosd-notify', 'xosd_hoffset', 5);
 
     # set up Irssi signal handlers
-    Irssi::signal_add_last('window item hilight', 'win_hl');
-    Irssi::signal_add_last('message private', 'event_privmsg'); # should take precedence
+    Irssi::signal_add('window item hilight', 'win_hl');
+    Irssi::signal_add('message private', 'event_privmsg'); # should take precedence
 
     # set up command handlers
     Irssi::command_bind xosd => \&xosd_cmd;
@@ -132,6 +132,65 @@ sub save_settings {
     &info("config file written to $conf_file");
 }
 
+sub load_settings {
+    my ($conf_file) = @_ ;
+
+    # load a sensible default
+    if (! $conf_file) { $conf_file = "$ENV{HOME}/.irssi/.xosd-notifyrc"; }
+
+    open(CONF, "$conf_file") or $conf_file = "EXCEPTION";
+    if ("$conf_file" eq "EXCEPTION") {
+        &warn("error writing to $conf_file - $@");
+        return ;
+    }
+
+    while (<CONF>) {
+        # strip newline, skip comments and blank lines, and remove whitespace
+        chomp;
+        next if /^#/ ;
+        next if /^$/ ;
+        s/\s// ;
+
+        my ($key, $value) = split(/:/); 
+
+        # check each key to see if it should be loaded
+        if ($key =~ /^xosd_font$/) { 
+            Irssi::settings_set_str('xosd_font', $value);
+        } 
+        elsif ($key =~ /^xosd_foreground$/) {
+            Irssi::settings_set_str('xosd_foreground', $value);
+        }
+        elsif ($key =~ /^xosd_background$/) {
+            Irssi::settings_set_str('xosd_background', $value);
+        }
+        elsif ($key =~ /^xosd_shadow_colour$/) {
+            Irssi::settings_set_str('xosd_shadow_colour', $value);
+        }
+        elsif ($key =~ /^xosd_position$/) {
+            Irssi::settings_set_str('xosd_position', $value);
+        }
+        elsif ($key =~ /^xosd_timeout$/) {
+            Irssi::settings_set_int('xosd_timeout', $value);
+        }
+        elsif ($key =~ /^xosd_border$/) {
+            Irssi::settings_set_int('xosd_border', $value);
+        }
+        elsif ($key =~ /^xosd_shadow_offset$/) {
+            Irssi::settings_set_int('xosd_shadow_offset', $value);
+        }
+        elsif ($key =~ /^xosd_voffset$/) {
+            Irssi::settings_set_int('xosd_voffset', $value);
+        }
+        elsif ($key =~ /^xosd_hoffset$/) {
+            Irssi::settings_set_int('xosd_hoffset', $value);
+        }
+    }
+
+    # now load the new settings
+    &osd_config();
+
+}
+
 
 ##### utility subs ######
 
@@ -188,6 +247,7 @@ sub event_privmsg {
 
 sub win_hl {
     return if ! $enabled ;
+    return if $osd->is_onscreen();
     my ($witem) = @_;
     $osd->string(0, "highlight in " . $witem->{ name } );
 }
@@ -217,8 +277,14 @@ sub xosd_cmd {
         &osd_config();
         $osd->string(0, 'xosd-notify: reconfigured');
     }
-    elsif ("$command" eq 'save') {
+    elsif ("$command" eq 'save') {          # save configuration to file
         &save_settings($args[0]);
+    }
+    elsif ("$command" eq 'load') {          # load configuration to file
+        &load_settings($args[0]);
+    }
+    elsif ("$command" eq 'clear') {         # remove OSD from screen
+        $osd->hide();
     }
     else {                                  # default 'fall-through'
         &info('invalid command!');
