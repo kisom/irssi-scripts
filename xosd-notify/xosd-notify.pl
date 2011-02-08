@@ -217,18 +217,18 @@ sub translate_position {
     $position = lc($position);
 
     # get vertical position
-    if    ( $position =~ /^'top/ )      { $vert = XOSD_top; }
-    elsif ( $position =~ /^'middle/ )   { $vert = XOSD_middle; }
-    elsif ( $position =~ /^'center/ )   { $vert = XOSD_middle; }
-    elsif ( $position =~ /^'bottom/ )   { $vert = XOSD_bottom; }
-    else                                { $vert = XOSD_top; }       # default
+    if    ( $position =~ /^'?top/ )     { $vert = XOSD_top; }
+    elsif ( $position =~ /^'?middle/ )  { $vert = XOSD_middle; }
+    elsif ( $position =~ /^'?center/ )  { $vert = XOSD_middle; }
+    elsif ( $position =~ /^'?bottom/ )  { $vert = XOSD_bottom; }
+    else                                { $vert = XOSD_center; }       # default
 
     # get horizontal position
-    if    ( $position =~ /right'$/ )    { $horiz = XOSD_right; }
-    elsif ( $position =~ /left'$/ )     { $horiz = XOSD_left; }
-    elsif ( $position =~ /center'$/ )   { $horiz = XOSD_center; }
-    elsif ( $position =~ /middle'$/ )   { $horiz = XOSD_center; }
-    else                                { $horiz = XOSD_left; }     # default
+    if    ( $position =~ /right'?$/ )   { $horiz = XOSD_right; }
+    elsif ( $position =~ /left'?$/ )    { $horiz = XOSD_left; }
+    elsif ( $position =~ /center'?$/ )  { $horiz = XOSD_center; }
+    elsif ( $position =~ /middle'?$/ )  { $horiz = XOSD_center; }
+    else                                { $horiz = XOSD_center; }     # default
 
     return ($vert, $horiz);
 }
