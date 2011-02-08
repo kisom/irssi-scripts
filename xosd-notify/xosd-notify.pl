@@ -104,12 +104,18 @@ sub save_settings {
     # load a sensible default
     if (! $conf_file) { $conf_file = "$ENV{HOME}/.irssi/.xosd-notifyrc"; }
     
-    open(CONF, ">$conf_file") or 
+    open(CONF, ">$conf_file") or $conf_file = "EXCEPTION";
+    if ("$conf_file" eq "EXCEPTION") {
+        &warn("error writing to $conf_file - $@");
+        return ;
+    }
 
     print CONF "# xosd-notify.pl irssi script saved configuration settings\n";
     print CONF "\nxosd_font: " . Irssi::settings_get_str('xosd_font');
-    print CONF "\nxosd_foreground: " . Irssi::settings_get_str('foreground');
-    print CONF "\nxosd_background: " . Irssi::settings_get_str('background');
+    print CONF "\nxosd_foreground: ";
+    print CONF Irssi::settings_get_str('xosd_foreground');
+    print CONF "\nxosd_background: ";
+    print CONF Irssi::settings_get_str('xosd_background');
     print CONF "\nxosd_shadow_colour: ";
     print CONF Irssi::settings_get_str('xosd_shadow_colour');
     print CONF "\nxosd_position: " . Irssi::settings_get_str('xosd_position');
@@ -126,6 +132,7 @@ sub save_settings {
     &info("config file written to $conf_file");
 }
 
+
 ##### utility subs ######
 
 sub translate_position {
@@ -134,7 +141,6 @@ sub translate_position {
     my $horiz       = '';
 
     $position = lc($position);
-    &info("parsing position $position");
 
     # get vertical position
     if    ( $position =~ /^'top/ )      { $vert = XOSD_top; }
@@ -160,6 +166,14 @@ sub info {
     return if ! "$message";
 
     Irssi::print("[+] xosd-notify: $message");
+}
+
+# similar sub that adds a warning prefix
+sub warn {
+    my ($message) = @_ ;
+    return if ! "$message";
+
+    Irssi::print("[!] xosd-notify WARNING: $message");
 }
 
 
@@ -202,6 +216,9 @@ sub xosd_cmd {
         Irssi::signal_emit('setup changed');
         &osd_config();
         $osd->string(0, 'xosd-notify: reconfigured');
+    }
+    elsif ("$command" eq 'save') {
+        &save_settings($args[0]);
     }
     else {                                  # default 'fall-through'
         &info('invalid command!');
