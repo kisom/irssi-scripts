@@ -25,11 +25,15 @@ $VERSION = '0.1-prealpha';
 );
 
 my $num_lines       = 1;        # number of lines to use for the display
-my $osd             = "";
+my $osd             = "";       # the on-screen display object
+my $enabled         = 1;        # boolean flag
 
 
 ##### kick these shenanigans off #####
 &init();
+
+
+##### initialisation and configuration subs #####
 
 sub init {
     # set up Irssi settings
@@ -42,8 +46,11 @@ sub init {
     Irssi::settings_add_int('xosd-notify', 'xosd_border', 10); 
 
     # set up Irssi signal handlers
-    Irssi::signal_add_last('message private', 'event_privmsg');
     Irssi::signal_add_last('window item hilight', 'win_hl');
+    Irssi::signal_add_last('message private', 'event_privmsg'); # should take precedence
+
+    # set up command handlers
+    Irssi::command_bind xosd => \&xosd_cmd;
 
     $osd = X::Osd->new($num_lines); 
     &osd_setup();
@@ -51,6 +58,12 @@ sub init {
 }
 
 sub osd_setup {
+    &osd_config();
+    $osd->string(0, "xosd-notify $VERSION loaded!");
+    Irssi::print("xosd-notify $VERSION loaded!");
+}
+
+sub osd_config {
     my ($vert, $horiz) = &translate_position(Irssi::settings_get_str(
         'xosd_position'));
 
@@ -69,10 +82,11 @@ sub osd_setup {
     # $osd->set_shadow_colour();
 
     # osd should be done
-    $osd->string(0, "xosd-notify $VERSION loaded!");
-    Irssi::print("xosd-notify $VERSION loaded!");
-
+    Irssi::print("xosd-notify $VERSION reconfigured");
 }
+
+
+##### utility subs ######
 
 sub translate_position {
     my ($position)  = @_ ;
@@ -80,32 +94,81 @@ sub translate_position {
     my $horiz       = '';
 
     $position = lc($position);
+    &info("parsing position $position");
 
     # get vertical position
-    if    ( $position =~ /^top/ )       { $vert = XOSD_top; }
-    elsif ( $position =~ /^middle/ )    { $vert = XOSD_middle; }
-    elsif ( $position =~ /^center/ )    { $vert = XOSD_middle; }
-    elsif ( $position =~ /^bottom/ )    { $vert = XOSD_bottom; }
+    if    ( $position =~ /^'top/ )      { $vert = XOSD_top; }
+    elsif ( $position =~ /^'middle/ )   { $vert = XOSD_middle; }
+    elsif ( $position =~ /^'center/ )   { $vert = XOSD_middle; }
+    elsif ( $position =~ /^'bottom/ )   { $vert = XOSD_bottom; }
     else                                { $vert = XOSD_top; }       # default
 
     # get horizontal position
-    if    ( $position =~ /right$/ )     { $horiz = XOSD_right; }
-    elsif ( $position =~ /left$/ )      { $horiz = XOSD_left; }
-    elsif ( $position =~ /center$/ )    { $horiz = XOSD_center; }
-    elsif ( $position =~ /middle$/ )    { $horiz = XOSD_center; }
+    if    ( $position =~ /right'$/ )    { $horiz = XOSD_right; }
+    elsif ( $position =~ /left'$/ )     { $horiz = XOSD_left; }
+    elsif ( $position =~ /center'$/ )   { $horiz = XOSD_center; }
+    elsif ( $position =~ /middle'$/ )   { $horiz = XOSD_center; }
     else                                { $horiz = XOSD_left; }     # default
+
+    &info("vert: $vert");
+    &info(" hor: $horiz");
+    
 
     return ($vert, $horiz);
 }
 
+# simple sub to print a message identifying this script as the source
+# useful when a lot of status messages are being printed
+sub info {
+    my ($message) = @_;
+    return if ! "$message";
+
+    Irssi::print("[+] xosd-notify: $message");
+}
+
+
+##### event handlers ######
+
+# these were really too easy
 sub event_privmsg {
+    return if ! $enabled;
     my ($server, $data, $nick, $address) = @_ ;
     $osd->string(0, "$nick: $data");
 }
 
 sub win_hl {
+    return if ! $enabled ;
     my ($witem) = @_;
     $osd->string(0, "highlight in " . $witem->{ name } );
 }
 
+
+##### command and control subs ######
+
+# command handler
+sub xosd_cmd {
+    my ($argline, $server) = @_ ;
+    my ($command, @args)   = split(/ /, $argline);
+
+    if ("$command" eq 'enable') {           # provide ability to enable xosd
+        $osd->string(0, "xosd-notify enabled");
+        $enabled = 1;
+    }
+    elsif ("$command" eq 'disable') {       # provide ability to disable xosd
+        &info('xosd-notify disabled');
+        $enabled = 0;
+    }
+    elsif ("$command" eq 'test') {          # print a test message to screen
+                                            # useful for testing reconfigs
+        $osd->string(0, 'xosd testing output');
+    }
+    elsif ("$command" eq 'reconfigure') {
+        Irssi::signal_emit('setup changed');
+        &osd_config();
+        $osd->string(0, 'xosd-notify: reconfigured');
+    }
+    else {                                  # default 'fall-through'
+        &info('invalid command!');
+    }
+}
 
