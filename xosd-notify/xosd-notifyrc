@@ -1,0 +1,12 @@
+# xosd-notify.pl irssi script saved configuration settings
+
+xosd_font: -*-fixed-medium-*-normal-*-24-230-*-*-*-*-iso8859-1
+xosd_foreground: #0000FF
+xosd_background: #000000
+xosd_shadow_colour: #111
+xosd_position: 'bottom right'
+xosd_timeout: 3
+xosd_border: 10
+xosd_shadow_offset: 0
+xosd_voffset: 5
+xosd_hoffset: 5

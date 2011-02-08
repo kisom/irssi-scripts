@@ -8,18 +8,23 @@ dependencies:
     * libxosd-dev
     * X::Osd
 
+usage:
+    /load /path/to/xosd-notify.pl
+    it is now loaded; you can play with the settings to find a font you like
 
-commands:
-    * enable
-    * disable
-    * reconfigure
-    * test
-    * load_settings
-    * save_settings
+commands (enter using /xosd):
+    * enable: enable on-screen display
+    * disable: disable on-screen display
+    * reconfigure: require to reload settings after changing them
+    * test: puts a test message on the screen for verifying settings
+    * load_settings <config file>: load settings from the config file. if no 
+    config file is specified, loads from ~/.irssi/.xosd-notifyrc
+    * save_settings <config file>: save settings to the config file. if no
+    config file is specified, saves to ~/.irssi/.xosd-notifyrc
+    * clear: clear screen
 
-view settings:
-    * /set xosd_
+    ex. /xosd clear
+        /xosd save ~/.xosdrc
 
-todo:
-    * implement config_files
+the current settings may be viewed using '/set xosd_'
 
