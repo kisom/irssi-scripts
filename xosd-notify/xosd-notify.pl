@@ -100,13 +100,14 @@ sub osd_config {
 ##### configuration file subs #####
 sub save_settings {
     my ($conf_file) = @_ ;
+    my $exception = undef;
 
     # load a sensible default
     if (! $conf_file) { $conf_file = "$ENV{HOME}/.irssi/.xosd-notifyrc"; }
     
-    open(CONF, ">$conf_file") or $conf_file = "EXCEPTION";
-    if ("$conf_file" eq "EXCEPTION") {
-        &warn("error writing to $conf_file - $@");
+    open(CONF, ">$conf_file") or $exception = 1;
+    if (defined $exception) {
+        &warn("error writing to $conf_file - $!");
         return ;
     }
 
@@ -140,7 +141,7 @@ sub load_settings {
 
     open(CONF, "$conf_file") or $conf_file = "EXCEPTION";
     if ("$conf_file" eq "EXCEPTION") {
-        &warn("error writing to $conf_file - $@");
+        &warn("error writing to $conf_file - $!");
         return ;
     }
 
@@ -250,6 +251,8 @@ sub win_hl {
     return if ! $enabled ;
     return if $osd->is_onscreen();
     my ($witem) = @_;
+    return if (!("$witem->{name}" =~ /^#/));# hack to skip if hilight is not
+                                            # coming from a channel
     $osd->string(0, "highlight in " . $witem->{ name } );
 }
 
@@ -279,9 +282,11 @@ sub xosd_cmd {
         $osd->string(0, 'xosd-notify: reconfigured');
     }
     elsif ("$command" eq 'save') {          # save configuration to file
+        $args[0] =~ s/^~/$ENV{HOME}/ ;
         &save_settings($args[0]);
     }
     elsif ("$command" eq 'load') {          # load configuration to file
+        $args[0] =~ s/^~/$ENV{HOME}/ ;
         &load_settings($args[0]);
     }
     elsif ("$command" eq 'clear') {         # remove OSD from screen
