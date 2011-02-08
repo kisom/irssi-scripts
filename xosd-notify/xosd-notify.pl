@@ -40,7 +40,7 @@ sub init {
     Irssi::settings_add_str('xosd-notify', 'xosd_font', 'fixed');
     Irssi::settings_add_str('xosd-notify', 'xosd_foreground', '#00FF00');
     Irssi::settings_add_str('xosd-notify', 'xosd_background', '#000000');
-    Irssi::settings_add_str('xosd-notify', 'xosd_shadow-colour', '#111');
+    Irssi::settings_add_str('xosd-notify', 'xosd_shadow_colour', '#111');
     Irssi::settings_add_str('xosd-notify', 'xosd_position', 'top-left');
     Irssi::settings_add_int('xosd-notify', 'xosd_timeout', 5);
     Irssi::settings_add_int('xosd-notify', 'xosd_border', 10); 
@@ -79,8 +79,8 @@ sub osd_config {
     $osd->set_outline_offset(Irssi::settings_get_int('xosd_border'));
 
     # setup shadow
-    $osd->set_shadow_offset(Irssi::settings_get_int('xosd_shadow_offset');
-    $osd->set_shadow_colour(Irssi::settings_get_str('xosd_shadow_colour');
+    $osd->set_shadow_offset(Irssi::settings_get_int('xosd_shadow_offset'));
+    $osd->set_shadow_colour(Irssi::settings_get_str('xosd_shadow_colour'));
 
     # setup screen position
     $osd->set_pos($vert);
@@ -90,13 +90,41 @@ sub osd_config {
     $osd->set_timeout(Irssi::settings_get_int('xosd_timeout'));
 
     # set the horizontal / vertical offsets
-    $osd->set_vertical_offset(Irssi::settings_get_int('xosd_voffset');
-    $osd->set_horizontal_offset(Irssi::settings_get_int('xosd_hoffset');
+    $osd->set_vertical_offset(Irssi::settings_get_int('xosd_voffset'));
+    $osd->set_horizontal_offset(Irssi::settings_get_int('xosd_hoffset'));
 
     # osd should be done
     Irssi::print("xosd-notify $VERSION configured");
 }
 
+##### configuration file subs #####
+sub save_settings {
+    my ($conf_file) = @_ ;
+
+    # load a sensible default
+    if (! $conf_file) { $conf_file = "$ENV{HOME}/.irssi/.xosd-notifyrc"; }
+    
+    open(CONF, ">$conf_file") or 
+
+    print CONF "# xosd-notify.pl irssi script saved configuration settings\n";
+    print CONF "\nxosd_font: " . Irssi::settings_get_str('xosd_font');
+    print CONF "\nxosd_foreground: " . Irssi::settings_get_str('foreground');
+    print CONF "\nxosd_background: " . Irssi::settings_get_str('background');
+    print CONF "\nxosd_shadow_colour: ";
+    print CONF Irssi::settings_get_str('xosd_shadow_colour');
+    print CONF "\nxosd_position: " . Irssi::settings_get_str('xosd_position');
+    print CONF "\nxosd_timeout: ", Irssi::settings_get_int('xosd_timeout');
+    print CONF "\nxosd_border: ", Irssi::settings_get_int('xosd_border');
+    print CONF "\nxosd_shadow_offset: ";
+    print CONF Irssi::settings_get_int('xosd_shadow_offset');
+    print CONF "\nxosd_voffset: ", Irssi::settings_get_int('xosd_voffset');
+    print CONF "\nxosd_hoffset: ", Irssi::settings_get_int('xosd_hoffset');
+    print CONF "\n";
+
+    close CONF;
+
+    &info("config file written to $conf_file");
+}
 
 ##### utility subs ######
 
