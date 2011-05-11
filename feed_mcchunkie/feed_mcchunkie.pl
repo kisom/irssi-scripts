@@ -32,33 +32,15 @@ my $bot_nick   = 'mcchunkie';
 &init();
 
 
-# thanks brycec
-sub mensaje {
-    my ($cmd, $server, $winitem) = @_;
-    my ( $param, $target, $data) = $cmd =~ /^(-\S*\s)?(\S*)\s(.*)/;
-    
-    Irssi::print("target: $target");
-    Irssi::print("data:   $data");
-
-}
-
+#  stupid simple
 sub window_test {
-    for my $item (@_) { print $item; }
-    my ($server, $chan, $nick, $address) = @_;
-    #my ($channel, $blah) = @_;
-    Irssi::print("$chan");
+    my ($server, $message, $nick, $address, $chan) = @_;
     
-    if ($chan =~ /^$bot_nick: no/) {
-        Irssi::print('sending counter message!' . " '$bot_nick: yes'");
+    if ($message=~ m/^$bot_nick: no/) {
         $server->send_message($chan, "$bot_nick: yes", 0);
-        $server->print($chan, 'tesitng');
     }
 }
 
 sub init {
-    #Irssi::signal_add_last('message public', 'chan_msg');
-    #Irssi::signal_add('server sendmsg', 'window_test');
-    #Irssi::signal_add('msg', 'chan_msg');
     Irssi::signal_add('message public', 'window_test');
-    #Irssi::signal_add("window activity", 'window_test');
 }
